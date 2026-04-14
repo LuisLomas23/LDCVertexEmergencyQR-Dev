@@ -1,4 +1,13 @@
+import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
+
+type UserProfile = {
+  id: string;
+  wixMemberId: string;
+  email: string;
+  fullName: string;
+  planStatus: string;
+};
 
 function HomePage() {
   return (
@@ -33,7 +42,7 @@ function HomePage() {
         </p>
 
         <Link
-          to="/dashboard?userId=test123&fullName=Luis%20Lomas&email=luis.d.lomas@gmail.com"
+          to="/dashboard?userId=17f2c59b-79e3-4009-a759-a04fb34fd3f0"
           style={{
             display: 'inline-block',
             background: '#c62828',
@@ -44,7 +53,7 @@ function HomePage() {
             fontWeight: 700,
           }}
         >
-          Probar dashboard
+          Probar dashboard real
         </Link>
       </div>
     </div>
@@ -54,10 +63,50 @@ function HomePage() {
 function DashboardPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-
   const userId = params.get('userId') || '';
-  const fullName = params.get('fullName') || 'Usuario';
-  const email = params.get('email') || 'Sin email';
+
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!userId) {
+        setError('No se recibió userId en la URL.');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          'https://azurefunction-emergencyqr-dev-hzh9g7c2eeezf7h7.mexicocentral-01.azurewebsites.net/api/get-user-profile',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'No se pudo obtener el perfil del usuario.');
+        }
+
+        setUser(data);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Ocurrió un error inesperado.';
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, [userId]);
 
   return (
     <div
@@ -89,13 +138,7 @@ function DashboardPage() {
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '20px',
-          }}
-        >
+        {loading && (
           <div
             style={{
               background: '#fff',
@@ -104,62 +147,99 @@ function DashboardPage() {
               boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
             }}
           >
-            <h2 style={{ marginTop: 0, color: '#222' }}>Datos de la sesión</h2>
-            <p><strong>Nombre:</strong> {fullName}</p>
-            <p><strong>Email:</strong> {email}</p>
-            <p><strong>User ID:</strong> {userId}</p>
+            Cargando perfil del usuario...
           </div>
+        )}
 
+        {!loading && error && (
           <div
             style={{
               background: '#fff',
               borderRadius: '18px',
               padding: '24px',
               boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+              color: '#c62828',
+              fontWeight: 700,
             }}
           >
-            <h2 style={{ marginTop: 0, color: '#222' }}>Siguiente paso</h2>
-            <p>Ahora sigue capturar y guardar el perfil médico del usuario.</p>
-            <button
+            Error: {error}
+          </div>
+        )}
+
+        {!loading && !error && user && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '20px',
+            }}
+          >
+            <div
               style={{
-                background: '#c62828',
-                color: '#fff',
-                border: 'none',
-                padding: '12px 18px',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontWeight: 700,
+                background: '#fff',
+                borderRadius: '18px',
+                padding: '24px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
               }}
             >
-              Completar perfil médico
-            </button>
-          </div>
+              <h2 style={{ marginTop: 0, color: '#222' }}>Datos de la sesión</h2>
+              <p><strong>Nombre:</strong> {user.fullName}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>User ID:</strong> {user.id}</p>
+              <p><strong>Plan:</strong> {user.planStatus}</p>
+            </div>
 
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: '18px',
-              padding: '24px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-            }}
-          >
-            <h2 style={{ marginTop: 0, color: '#222' }}>QR personal</h2>
-            <p>Aquí después mostraremos el QR de acceso médico del usuario.</p>
-            <button
+            <div
               style={{
-                background: '#222',
-                color: '#fff',
-                border: 'none',
-                padding: '12px 18px',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontWeight: 700,
+                background: '#fff',
+                borderRadius: '18px',
+                padding: '24px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
               }}
             >
-              Ver mi QR
-            </button>
+              <h2 style={{ marginTop: 0, color: '#222' }}>Siguiente paso</h2>
+              <p>Ahora sigue capturar y guardar el perfil médico del usuario.</p>
+              <button
+                style={{
+                  background: '#c62828',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 18px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                }}
+              >
+                Completar perfil médico
+              </button>
+            </div>
+
+            <div
+              style={{
+                background: '#fff',
+                borderRadius: '18px',
+                padding: '24px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+              }}
+            >
+              <h2 style={{ marginTop: 0, color: '#222' }}>QR personal</h2>
+              <p>Aquí después mostraremos el QR de acceso médico del usuario.</p>
+              <button
+                style={{
+                  background: '#222',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '12px 18px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                }}
+              >
+                Ver mi QR
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div style={{ marginTop: '24px' }}>
           <Link
