@@ -596,8 +596,10 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+<Route path="/dashboard" element={<DashboardPage />} />
+<Route path="/profile" element={<ProfilePage />} />
+<Route path="/my-qr" element={<MyQrPage />} />
+<Route path="/emergency/:publicId" element={<EmergencyPage />} />
     </Routes>
   );
 }
