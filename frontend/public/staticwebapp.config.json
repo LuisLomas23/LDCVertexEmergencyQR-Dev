@@ -1,11 +1,23 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/images/*", "/api/*"]
-  },
-  "responseOverrides": {
-    "404": {
+  "routes": [
+    {
+      "route": "/dashboard",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/profile",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/my-qr",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/emergency/*",
       "rewrite": "/index.html"
     }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html"
   }
 }
