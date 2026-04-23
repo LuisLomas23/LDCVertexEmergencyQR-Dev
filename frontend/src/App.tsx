@@ -173,7 +173,7 @@ function DashboardPage() {
         >
           <h1 style={{ margin: 0, fontSize: '32px' }}>Bienvenido a EmergencyQR</h1>
           <p style={{ marginTop: '10px', marginBottom: 0, opacity: 0.95 }}>
-            Tu perfil médico ya está conectado con Wix.
+            Aqui encontraras informacion del Perfil Medico.
           </p>
         </div>
 
