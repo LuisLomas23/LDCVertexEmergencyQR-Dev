@@ -25,8 +25,8 @@ type UserProfile = {
   medicalProfile?: MedicalProfile;
 };
 
-const WIX_API_BASE = 'https://www.ldcvertextech.com/_functions';
-const WIX_MEDICAL_PROFILE_URL = 'https://www.ldcvertextech.com/myperfilmedico';
+const WIX_API_BASE = 'https://www.emergencyqr.mx/_functions';
+const WIX_MEDICAL_PROFILE_URL = 'https://www.emergencyqr.mx/myperfilmedico';
 
 function HomePage() {
   return (
